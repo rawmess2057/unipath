@@ -1,0 +1,130 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id        String   @id @default(uuid())
+  clerkId   String   @unique
+  email     String
+  name      String?
+  profile   Profile?
+  cvAnalyses      CvAnalysis[]
+  roadmaps        Roadmap[]
+  scoreSnapshots  ScoreSnapshot[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id              String   @id @default(uuid())
+  studentId       String   @unique
+  student         Student  @relation(fields: [studentId], references: [id])
+  fieldOfStudy    String?
+  university      String?
+  graduationDate  DateTime?
+  targetIndustry  String?
+  visaStatus      String?
+  skills          String[]
+  workExperiences Json?
+  certifications  Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model CvAnalysis {
+  id                   String   @id @default(uuid())
+  studentId            String
+  student              Student  @relation(fields: [studentId], references: [id])
+  fileHash             String
+  originalFileName     String?
+  overallSummary       String?
+  strengths            String[]
+  priorityImprovements String[]
+  structureScore       Int?
+  keywordsScore        Int?
+  clarityScore         Int?
+  ukConventionsScore   Int?
+  cvQualityScore       Int?
+  confidence           String?
+  complianceChecklist  Json?
+  rawResponse          Json?
+  isFallback           Boolean  @default(false)
+  createdAt            DateTime @default(now())
+
+  @@index([studentId])
+  @@index([fileHash])
+}
+
+model Roadmap {
+  id                  String   @id @default(uuid())
+  studentId           String
+  student             Student  @relation(fields: [studentId], references: [id])
+  generationMetadata  Json?
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  tasks               RoadmapTask[]
+
+  @@index([studentId])
+}
+
+model RoadmapTask {
+  id              String    @id @default(uuid())
+  roadmapId       String
+  roadmap         Roadmap   @relation(fields: [roadmapId], references: [id])
+  phase           String
+  order           Int
+  title           String
+  description     String
+  category        String
+  estimatedEffort String
+  pointsValue     Int
+  isVisaRelated   Boolean   @default(false)
+  prerequisites   String[]
+  resources       Json?
+  completed       Boolean   @default(false)
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+
+  @@index([roadmapId])
+}
+
+model VisaContent {
+  id         String   @id @default(uuid())
+  visaType   String
+  stage      String
+  snippet    String
+  disclaimer String
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([visaType, stage])
+}
+
+model ScoreSnapshot {
+  id               String   @id @default(uuid())
+  studentId        String
+  student          Student  @relation(fields: [studentId], references: [id])
+  totalScore       Int
+  cvQuality        Float
+  skillsMatch      Float
+  workExperience   Float
+  certifications   Float
+  platformActivity Float
+  createdAt        DateTime @default(now())
+
+  @@index([studentId])
+}
+
+model ScoreRubric {
+  id        String   @id @default(uuid())
+  data      Json
+  version   Int      @default(1)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
