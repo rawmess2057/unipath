@@ -1,6 +1,6 @@
 import type { ApiResponse } from '@unipath/shared';
 
-const BASE_URL = '/api';
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 let authHeaders: Record<string, string> = {};
 
