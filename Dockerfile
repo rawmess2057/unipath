@@ -27,7 +27,7 @@ COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
 COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 
-RUN cd apps/api && npx prisma generate
+RUN cd apps/api && npx prisma@6 generate
 
 ENV PORT=4000
 EXPOSE 4000
