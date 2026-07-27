@@ -12,8 +12,20 @@ import roadmapRoutes from './routes/roadmap.routes.js';
 const app = express();
 
 app.use(helmet());
-const corsOrigin = process.env.CORS_ORIGIN?.split(',') || ['http://localhost:5173', 'http://localhost:4000'];
-app.use(cors({ origin: corsOrigin, credentials: true }));
+const corsOrigin = process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) || ['http://localhost:5173', 'http://localhost:4000'];
+console.log('CORS allowed origins:', corsOrigin);
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || corsOrigin.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn('CORS blocked origin:', origin);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
+  },
+  credentials: true,
+}));
+app.options('*', cors({ origin: corsOrigin, credentials: true }));
 app.use(express.json({ limit: '10mb' }));
 
 app.use(healthRoutes);
