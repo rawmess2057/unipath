@@ -47,10 +47,10 @@ export function Dropzone({ onFile, accept = '.pdf', maxSize = 5, error: external
     <div
       className={`cursor-pointer rounded-xl border-2 border-dashed p-12 text-center transition-colors ${
         error
-          ? 'border-danger-300 bg-danger-50'
+          ? 'border-danger-400/50 bg-danger-500/10'
           : dragOver
-            ? 'border-brand-400 bg-brand-50'
-            : 'border-slate-300 hover:border-slate-400'
+            ? 'border-brand-400 bg-brand-500/10'
+            : 'border-white/10 hover:border-brand-400'
       }`}
       onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
       onDragLeave={() => setDragOver(false)}
@@ -70,27 +70,27 @@ export function Dropzone({ onFile, accept = '.pdf', maxSize = 5, error: external
 
       {file && !error ? (
         <div className="flex flex-col items-center gap-2">
-          <div className="rounded-full bg-success-100 p-3">
-            <FileText className="h-8 w-8 text-success-600" />
+          <div className="rounded-full bg-success-500/20 p-3">
+            <FileText className="h-8 w-8 text-success-300" />
           </div>
-          <p className="font-medium text-slate-700">{file.name}</p>
-          <p className="text-xs text-slate-400">{(file.size / 1024 / 1024).toFixed(1)}MB</p>
+          <p className="font-medium text-brand-100">{file.name}</p>
+          <p className="text-xs text-brand-200/60">{(file.size / 1024 / 1024).toFixed(1)}MB</p>
         </div>
       ) : (
         <>
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-100">
-            <Upload className="h-8 w-8 text-brand-500" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-500/20">
+            <Upload className="h-8 w-8 text-brand-300" />
           </div>
-          <p className="font-medium text-slate-700">Drag & drop your CV here</p>
-          <p className="mb-4 text-sm text-slate-500">or click to browse</p>
-          <div className="flex items-center justify-center gap-4 text-xs text-slate-400">
+          <p className="font-medium text-brand-100">Drag & drop your CV here</p>
+          <p className="mb-4 text-sm text-brand-200">or click to browse</p>
+          <div className="flex items-center justify-center gap-4 text-xs text-brand-200/60">
             <span className="flex items-center gap-1"><FileText className="h-3.5 w-3.5" /> PDF only</span>
             <span className="flex items-center gap-1"><AlertCircle className="h-3.5 w-3.5" /> Max {maxSize}MB</span>
           </div>
         </>
       )}
 
-      {error && <p className="mt-4 text-sm text-danger-600">{error}</p>}
+      {error && <p className="mt-4 text-sm text-danger-400">{error}</p>}
     </div>
   );
 }

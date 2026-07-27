@@ -11,7 +11,7 @@ export function ProgressBar({ value, max = 100, colorClass = 'bg-brand-500', siz
 
   return (
     <div
-      className={`w-full overflow-hidden rounded-full bg-slate-100 ${sizeClass}`}
+      className={`w-full overflow-hidden rounded-full bg-white/10 ${sizeClass}`}
       role="progressbar"
       aria-valuenow={Math.round(value)}
       aria-valuemin={0}

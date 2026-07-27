@@ -274,15 +274,21 @@ function HeroSection() {
 }
 
 function TrustBar() {
+  const items = ['Oxford', 'Cambridge', 'Imperial', 'UCL', 'LSE', 'Manchester', 'Edinburgh', 'King\'s College', 'Warwick', 'Bristol'];
+  const doubled = [...items, ...items];
   return (
-    <div className="border-b border-white/10 py-8">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-8 px-4 md:px-8">
-        <span className="text-sm font-medium text-brand-200">Trusted by students from</span>
-        {['Oxford', 'Cambridge', 'Imperial', 'UCL', 'LSE', 'Manchester', 'Edinburgh'].map((u) => (
-          <span key={u} className="text-lg font-semibold text-white/50">
-            {u}
-          </span>
-        ))}
+    <div className="border-b border-white/10 py-8 overflow-hidden">
+      <div className="mx-auto max-w-6xl px-4 md:px-8">
+        <p className="mb-6 text-center text-sm font-medium text-brand-200">Trusted by students from</p>
+        <div className="relative overflow-hidden">
+          <div className="flex gap-16" style={{ animation: 'marquee 30s linear infinite', width: 'fit-content' }}>
+            {doubled.map((u, i) => (
+              <span key={`${u}-${i}`} className="whitespace-nowrap text-lg font-semibold text-white/40">
+                {u}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -368,7 +374,7 @@ function HowItWorksSection() {
         <div className="mt-12 grid gap-8 md:grid-cols-3">
           {steps.map((step, i) => (
             <ScrollReveal key={step.num} className="h-full">
-              <div className="group h-full rounded-2xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-lg transition-shadow hover:shadow-xl">
+              <div className="group h-full rounded-2xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                 <div
                   className={`flex h-12 w-12 items-center justify-center rounded-full ${step.bg} ${step.text} text-xl font-bold`}
                 >
@@ -425,7 +431,7 @@ function FeaturesSection() {
         <div className="mt-12 grid gap-8 md:grid-cols-2">
           {features.map((f) => (
             <ScrollReveal key={f.title}>
-              <div className="group rounded-2xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-lg transition-all duration-300 hover:border-white/30 hover:bg-white/15 hover:shadow-xl">
+              <div className="group rounded-2xl border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-lg transition-all duration-300 hover:border-white/30 hover:bg-white/15 hover:shadow-xl hover:-translate-y-1">
                 <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/10">
                   <f.icon className="h-7 w-7 text-white" />
                 </div>

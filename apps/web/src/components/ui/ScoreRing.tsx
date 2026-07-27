@@ -65,7 +65,7 @@ export function ScoreRing({ value, size = 'md', animated = true }: ScoreRingProp
       aria-label={`Employability score: ${value} out of 100`}
     >
       <circle
-        stroke="#e2e8f0"
+        stroke="rgba(255,255,255,0.15)"
         fill="none"
         strokeWidth={stroke}
         r={normalizedRadius}
