@@ -2,6 +2,12 @@ import type { ApiResponse } from '@unipath/shared';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
+export interface CvUploadInput {
+  file: File;
+  targetIndustry: string;
+  fieldOfStudy: string;
+}
+
 let authHeaders: Record<string, string> = {};
 
 export function setAuthHeaders(headers: Record<string, string>) {
@@ -43,9 +49,14 @@ export const api = {
     request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
   patch: <T>(path: string, body: unknown) =>
     request<T>(path, { method: 'PATCH', body: JSON.stringify(body) }),
-  upload: async <T>(path: string, file: File): Promise<T> => {
+  upload: async <T>(path: string, file: File, extraFields?: Record<string, string>): Promise<T> => {
     const formData = new FormData();
     formData.append('file', file);
+    if (extraFields) {
+      for (const [key, value] of Object.entries(extraFields)) {
+        formData.append(key, value);
+      }
+    }
 
     const res = await fetch(`${BASE_URL}${path}`, {
       method: 'POST',

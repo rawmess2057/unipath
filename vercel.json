@@ -1,8 +1,0 @@
-{
-  "buildCommand": "npx turbo run build --filter=@unipath/web",
-  "outputDirectory": "apps/web/dist",
-  "framework": "vite",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
-}

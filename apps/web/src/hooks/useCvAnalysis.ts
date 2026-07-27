@@ -1,15 +1,11 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
+import type { CvUploadInput } from '../lib/api-client';
 import { api } from '../lib/api-client';
 
 export function useUploadCv() {
-  return useMutation({
-    mutationFn: ({ file, targetIndustry, fieldOfStudy }: { file: File; targetIndustry: string; fieldOfStudy: string }) => {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('targetIndustry', targetIndustry);
-      formData.append('fieldOfStudy', fieldOfStudy);
-      return fetch('/api/cv/analyze', { method: 'POST', body: formData }).then((r) => r.json());
-    },
+  return useMutation<{ id: string }, Error, CvUploadInput>({
+    mutationFn: ({ file, targetIndustry, fieldOfStudy }) =>
+      api.upload('/cv/analyze', file, { targetIndustry, fieldOfStudy }),
   });
 }
 

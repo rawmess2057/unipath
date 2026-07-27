@@ -23,12 +23,11 @@ export function CvAnalysisPage() {
     if (!file) return;
     setStatus('processing');
     try {
-      const res = await uploadMutation.mutateAsync({
+      const data = await uploadMutation.mutateAsync({
         file,
         targetIndustry: (profile as any)?.targetIndustry ?? 'tech',
         fieldOfStudy: (profile as any)?.fieldOfStudy ?? '',
       });
-      const data = res.data ?? res;
       setAnalysisId(data.id);
     } catch {
       setStatus('upload');
