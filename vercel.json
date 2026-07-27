@@ -1,6 +1,5 @@
 {
-  "rootDirectory": "apps/web",
-  "buildCommand": "cd ../.. && npx turbo run build --filter=@unipath/web",
+  "buildCommand": "npx turbo run build --filter=@unipath/web && cp -r apps/web/dist .",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
