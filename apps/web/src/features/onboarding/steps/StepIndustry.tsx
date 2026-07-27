@@ -21,8 +21,8 @@ export function StepIndustry({ value, onChange, error }: StepIndustryProps) {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-bold text-slate-800">What industry do you want to work in?</h2>
-        <p className="mt-1 text-sm text-slate-500">We'll tailor your roadmap to this industry.</p>
+        <h2 className="text-xl font-bold text-slate-800">Your goals</h2>
+        <p className="mt-1 text-sm text-slate-500">We use this to build your personalised roadmap.</p>
       </div>
 
       <div className="relative">

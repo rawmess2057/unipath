@@ -18,7 +18,7 @@ export function requireAuth(req: Request, _res: Response, next: NextFunction): v
   const clerkId = req.headers['x-clerk-user-id'] as string | undefined;
 
   if (!clerkId) {
-    throw new AppError(401, 'Authentication required');
+    return next(new AppError(401, 'Authentication required'));
   }
 
   req.user = { id: clerkId, clerkId };

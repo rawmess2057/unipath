@@ -18,6 +18,7 @@ router.post('/profile', requireAuth, async (req, res, next) => {
     const profile = await upsertProfile(req.user!.clerkId, req.headers['x-clerk-email'] as string ?? '', req.body);
     res.json({ success: true, data: profile });
   } catch (err) {
+    console.error('Profile upsert error:', err);
     next(err);
   }
 });

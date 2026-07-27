@@ -1,9 +1,9 @@
 import { SelectableCard } from '../../../components/ui/SelectableCard';
 
 const visaOptions = [
-  { value: 'student_visa', icon: '🎓', label: 'Student Visa', description: 'Currently studying in the UK' },
-  { value: 'graduate_route', icon: '🛂', label: 'Graduate Route', description: 'Post-study work visa (2 years)' },
-  { value: 'skilled_worker', icon: '💼', label: 'Skilled Worker Visa', description: 'Sponsored employment visa' },
+  { value: 'student_visa', icon: '🎓', label: 'Student Visa', description: 'Currently studying' },
+  { value: 'graduate_route', icon: '🛂', label: 'Graduate Route', description: '2 years post-study' },
+  { value: 'skilled_worker', icon: '💼', label: 'Skilled Worker', description: 'Sponsored employment' },
   { value: 'other', icon: '❓', label: 'Other / Not sure', description: "We'll help you figure it out" },
 ];
 
