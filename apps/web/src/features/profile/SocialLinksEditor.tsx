@@ -1,5 +1,5 @@
 import { AtSign, Briefcase, GitBranch, Globe, Link2, Plus, Trash2 } from 'lucide-react';
-import { Input } from '../../components/ui/Input';
+import type { ReactNode } from 'react';
 import type { ExtraLinkDraft } from './profile-types';
 
 interface SocialLinksEditorProps {
@@ -17,6 +17,15 @@ interface SocialLinksEditorProps {
 const linkInput =
   'rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 pl-9 text-sm text-white placeholder-brand-200/60 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 disabled:text-brand-200/40';
 
+const linkPill =
+  'inline-flex items-center gap-2 rounded-full bg-brand-500/20 px-3 py-1.5 text-sm font-medium text-brand-200 transition-colors hover:bg-brand-500/30 hover:text-brand-100';
+
+interface SavedLink {
+  label: string;
+  url: string;
+  icon: ReactNode;
+}
+
 export function SocialLinksEditor({ draft, onChange, editing }: SocialLinksEditorProps) {
   const updateExtra = (index: number, patch: Partial<ExtraLinkDraft>) => {
     const next = draft.extraLinks.map((link, i) => (i === index ? { ...link, ...patch } : link));
@@ -26,6 +35,44 @@ export function SocialLinksEditor({ draft, onChange, editing }: SocialLinksEdito
   const removeExtra = (index: number) => {
     onChange({ extraLinks: draft.extraLinks.filter((_, i) => i !== index) });
   };
+
+  if (!editing) {
+    const savedLinks: SavedLink[] = [
+      { label: 'Portfolio', url: draft.portfolioUrl, icon: <Briefcase className="h-4 w-4" /> },
+      { label: 'GitHub', url: draft.githubUrl, icon: <GitBranch className="h-4 w-4" /> },
+      { label: 'LinkedIn', url: draft.linkedinUrl, icon: <AtSign className="h-4 w-4" /> },
+      { label: 'Website', url: draft.websiteUrl, icon: <Globe className="h-4 w-4" /> },
+      ...draft.extraLinks
+        .filter((link) => link.label.trim() && link.url.trim())
+        .map((link) => ({ label: link.label, url: link.url, icon: <Link2 className="h-4 w-4" /> })),
+    ].filter((link) => link.url.trim());
+
+    if (savedLinks.length === 0) {
+      return (
+        <p className="text-sm text-brand-200/60">
+          No links added yet. Hit &quot;Edit Profile&quot; to add portfolio, GitHub, LinkedIn, or other links.
+        </p>
+      );
+    }
+
+    return (
+      <div className="flex flex-wrap gap-2">
+        {savedLinks.map((link) => (
+          <a
+            key={link.label}
+            href={link.url}
+            target="_blank"
+            rel="noreferrer"
+            className={linkPill}
+            title={link.url}
+          >
+            {link.icon}
+            {link.label}
+          </a>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
@@ -99,17 +146,15 @@ export function SocialLinksEditor({ draft, onChange, editing }: SocialLinksEdito
                 value={link.url}
                 onChange={(e) => updateExtra(idx, { url: e.target.value })}
               />
-              {editing && (
-                <button type="button" onClick={() => removeExtra(idx)} className="text-brand-200/60 hover:text-danger-400">
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              )}
+              <button type="button" onClick={() => removeExtra(idx)} className="text-brand-200/60 hover:text-danger-400">
+                <Trash2 className="h-4 w-4" />
+              </button>
             </div>
           ))}
         </div>
       )}
 
-      {editing && draft.extraLinks.length < 10 && (
+      {draft.extraLinks.length < 10 && (
         <button
           type="button"
           onClick={() => onChange({ extraLinks: [...draft.extraLinks, { label: '', url: '' }] })}

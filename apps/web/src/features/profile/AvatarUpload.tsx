@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
-import { Camera, User, X, Loader2 } from 'lucide-react';
+import { Camera, User, X, Loader2, ImageOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../lib/api-client';
+import { Modal } from '../../components/ui/Modal';
 
 interface AvatarUploadProps {
   value: string;
@@ -13,6 +14,8 @@ export function AvatarUpload({ value, onChange, disabled }: AvatarUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
@@ -26,6 +29,7 @@ export function AvatarUpload({ value, onChange, disabled }: AvatarUploadProps) {
     setUploading(true);
     try {
       const res = await api.upload<{ url: string }>('/profile/upload', file, { type: 'avatar' });
+      setImgError(false);
       onChange(res.url);
       toast.success('Profile photo updated');
     } catch {
@@ -34,6 +38,24 @@ export function AvatarUpload({ value, onChange, disabled }: AvatarUploadProps) {
       setUploading(false);
     }
   };
+
+  const avatarBody = value && !imgError ? (
+    <img
+      src={value}
+      alt="Profile"
+      onClick={() => setPreviewOpen(true)}
+      onError={() => setImgError(true)}
+      className="h-full w-full cursor-pointer object-cover"
+    />
+  ) : (
+    <div className="flex h-full w-full items-center justify-center">
+      {imgError ? (
+        <ImageOff className="h-12 w-12 text-brand-200/40" />
+      ) : (
+        <User className="h-12 w-12 text-brand-200/50" />
+      )}
+    </div>
+  );
 
   return (
     <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-end sm:gap-5">
@@ -50,13 +72,7 @@ export function AvatarUpload({ value, onChange, disabled }: AvatarUploadProps) {
           if (f) void handleFile(f);
         }}
       >
-        {value ? (
-          <img src={value} alt="Profile" className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <User className="h-12 w-12 text-brand-200/50" />
-          </div>
-        )}
+        {avatarBody}
         {uploading && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/50">
             <Loader2 className="h-8 w-8 animate-spin text-white" />
@@ -85,7 +101,7 @@ export function AvatarUpload({ value, onChange, disabled }: AvatarUploadProps) {
             {value && (
               <button
                 type="button"
-                onClick={() => onChange('')}
+                onClick={() => { setImgError(false); onChange(''); }}
                 className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-brand-200 hover:text-danger-400"
               >
                 <X className="h-4 w-4" /> Remove
@@ -95,6 +111,23 @@ export function AvatarUpload({ value, onChange, disabled }: AvatarUploadProps) {
           </>
         )}
       </div>
+
+      <Modal
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        header="Profile Photo"
+        body={
+          <div className="flex justify-center">
+            {value && !imgError ? (
+              <img src={value} alt="Profile" className="max-h-[60vh] rounded-lg object-contain" />
+            ) : (
+              <div className="flex h-40 items-center justify-center text-brand-200/60">
+                <ImageOff className="h-10 w-10" />
+              </div>
+            )}
+          </div>
+        }
+      />
     </div>
   );
 }

@@ -1,8 +1,19 @@
 import { useState } from 'react';
-import { Plus, Pencil, Trash2, Link2, FileText, Loader2, X } from 'lucide-react';
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Link2,
+  FileText,
+  Loader2,
+  X,
+  Eye,
+  ExternalLink,
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { Modal } from '../../components/ui/Modal';
 import { api } from '../../lib/api-client';
 import { emptyCert, type CertDraft } from './profile-types';
 
@@ -18,6 +29,117 @@ interface FormState {
 }
 
 const labelClass = 'text-sm font-medium text-brand-100';
+
+function isImageUrl(url: string): boolean {
+  return /\.(png|jpe?g|gif|webp|bmp|svg)(\?.*)?$/i.test(url);
+}
+
+interface AttachmentPreviewProps {
+  url: string;
+  name?: string;
+  onRemove?: () => void;
+}
+
+function AttachmentPreview({ url, name, onRemove }: AttachmentPreviewProps) {
+  const [open, setOpen] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const isImage = isImageUrl(url);
+
+  return (
+    <>
+      {isImage ? (
+        <div className="group relative inline-block overflow-hidden rounded-lg border border-white/10">
+          <button type="button" onClick={() => setOpen(true)} className="block" aria-label="Preview attachment">
+            {imgError ? (
+              <div className="flex h-20 w-28 items-center justify-center bg-white/5">
+                <FileText className="h-8 w-8 text-brand-200/60" />
+              </div>
+            ) : (
+              <img
+                src={url}
+                alt={name || 'Certificate'}
+                onError={() => setImgError(true)}
+                className="h-20 w-28 object-cover"
+              />
+            )}
+          </button>
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
+            <Eye className="h-6 w-6 text-white" />
+          </div>
+          {onRemove && (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="absolute right-1 top-1 rounded bg-black/60 p-1 text-white hover:bg-danger-500"
+              aria-label="Remove attachment"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2">
+          <FileText className="h-4 w-4 flex-shrink-0 text-brand-300" />
+          <span className="flex-1 truncate text-sm text-brand-200">{name || 'Attachment'}</span>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center gap-1 text-xs text-brand-300 hover:underline"
+          >
+            <Eye className="h-3.5 w-3.5" /> Preview
+          </button>
+          <a href={url} target="_blank" rel="noreferrer" className="text-brand-300 hover:text-brand-200" aria-label="Open attachment">
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+          {onRemove && (
+            <button type="button" onClick={onRemove} className="text-brand-200/60 hover:text-danger-400" aria-label="Remove attachment">
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      )}
+
+      <Modal
+        open={open}
+        onClose={() => setOpen(false)}
+        header={name || 'Attachment Preview'}
+        body={
+          isImage ? (
+            <div className="flex justify-center">
+              {!imgError ? (
+                <img src={url} alt={name || 'Certificate'} className="max-h-[60vh] rounded-lg object-contain" />
+              ) : (
+                <div className="flex h-40 items-center justify-center text-brand-200/60">
+                  <FileText className="h-10 w-10" />
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex justify-center">
+                <iframe
+                  src={url}
+                  title={name || 'Certificate preview'}
+                  className="h-[55vh] w-full rounded-lg border border-white/10 bg-white"
+                />
+              </div>
+              <div className="flex justify-center">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => { window.open(url, '_blank', 'noopener'); }}
+                >
+                  <ExternalLink className="h-4 w-4" /> Open in new tab
+                </Button>
+              </div>
+            </div>
+          )
+        }
+      />
+    </>
+  );
+}
 
 export function CertificationEditor({ values, onChange, editing }: CertificationEditorProps) {
   const [form, setForm] = useState<FormState | null>(null);
@@ -75,7 +197,7 @@ export function CertificationEditor({ values, onChange, editing }: Certification
             <div key={idx} className="relative rounded-lg bg-white/5 p-4 pr-20">
               <p className="font-medium text-white">{cert.name || 'Untitled certification'}</p>
               <p className="text-xs text-brand-200">{cert.issuer}</p>
-              <div className="mt-1 flex flex-wrap gap-3 text-xs text-brand-200/60">
+              <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-brand-200/60">
                 {cert.dateObtained && <span>Completed: {cert.dateObtained}</span>}
                 {cert.credentialUrl && (
                   <a href={cert.credentialUrl} target="_blank" rel="noreferrer"
@@ -83,13 +205,16 @@ export function CertificationEditor({ values, onChange, editing }: Certification
                     <Link2 className="h-3 w-3" /> Credential
                   </a>
                 )}
-                {cert.attachmentUrl && (
-                  <a href={cert.attachmentUrl} target="_blank" rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-brand-300 hover:underline">
-                    <FileText className="h-3 w-3" /> {cert.attachmentName || 'Attachment'}
-                  </a>
-                )}
               </div>
+              {cert.attachmentUrl && (
+                <div className="mt-2">
+                  <AttachmentPreview
+                    url={cert.attachmentUrl}
+                    name={cert.attachmentName}
+                    onRemove={editing ? () => onChange(values.map((v, i) => (i === idx ? { ...v, attachmentUrl: '', attachmentName: '' } : v))) : undefined}
+                  />
+                </div>
+              )}
               {editing && (
                 <div className="absolute right-3 top-3 flex gap-1">
                   <button type="button" onClick={() => startForm(idx, cert)} className="rounded p-1 text-brand-200/60 hover:text-white">
@@ -134,17 +259,11 @@ export function CertificationEditor({ values, onChange, editing }: Certification
           <div className="space-y-1.5">
             <label className={labelClass}>Attach certificate</label>
             {form.draft.attachmentUrl ? (
-              <div className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2">
-                <FileText className="h-4 w-4 text-brand-300" />
-                <a href={form.draft.attachmentUrl} target="_blank" rel="noreferrer"
-                  className="flex-1 truncate text-sm text-brand-200 hover:text-brand-300 hover:underline">
-                  {form.draft.attachmentName || 'View attachment'}
-                </a>
-                <button type="button" onClick={() => setForm({ ...form, draft: { ...form.draft, attachmentUrl: '', attachmentName: '' } })}
-                  className="text-brand-200/60 hover:text-danger-400" aria-label="Remove attachment">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
+              <AttachmentPreview
+                url={form.draft.attachmentUrl}
+                name={form.draft.attachmentName}
+                onRemove={() => setForm({ ...form, draft: { ...form.draft, attachmentUrl: '', attachmentName: '' } })}
+              />
             ) : (
               <div>
                 <input
