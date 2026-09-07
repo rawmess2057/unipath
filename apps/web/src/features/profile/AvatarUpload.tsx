@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Camera, User, X, Loader2, ImageOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { api } from '../../lib/api-client';
@@ -16,6 +16,10 @@ export function AvatarUpload({ value, onChange, disabled }: AvatarUploadProps) {
   const [dragOver, setDragOver] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  useEffect(() => {
+    setImgError(false);
+  }, [value]);
 
   const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {

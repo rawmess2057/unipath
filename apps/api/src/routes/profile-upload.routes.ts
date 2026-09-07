@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import multer from 'multer';
 import { mkdirSync } from 'node:fs';
+import { extname } from 'node:path';
+import { randomBytes } from 'node:crypto';
 import { requireAuth } from '../middleware/auth.js';
 import { env } from '../config/env.js';
 
@@ -11,8 +13,16 @@ const ALLOWED_MIME: Record<string, string[]> = {
   certificate: ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'],
 };
 
+const storage = multer.diskStorage({
+  destination: env.UPLOAD_DIR,
+  filename: (_req, file, cb) => {
+    const ext = extname(file.originalname).toLowerCase().slice(0, 10);
+    cb(null, `${Date.now()}-${randomBytes(4).toString('hex')}${ext}`);
+  },
+});
+
 const upload = multer({
-  dest: env.UPLOAD_DIR,
+  storage,
   limits: { fileSize: 10 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     if (!Object.values(ALLOWED_MIME).some((mimes) => mimes.includes(file.mimetype))) {
