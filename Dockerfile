@@ -32,4 +32,4 @@ RUN cd apps/api && npx prisma@6 generate
 ENV PORT=4000
 EXPOSE 4000
 
-CMD ["node", "apps/api/dist/index.js"]
+CMD ["sh", "-c", "cd apps/api && npx prisma@6 migrate deploy && node /app/apps/api/dist/index.js"]
