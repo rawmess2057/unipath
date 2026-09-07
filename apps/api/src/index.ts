@@ -1,15 +1,22 @@
 import express, { type Request, type Response, type NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import { existsSync, mkdirSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { prisma } from './lib/prisma.js';
 import healthRoutes from './routes/health.routes.js';
 import profileRoutes from './routes/profile.routes.js';
+import profileUploadRoutes from './routes/profile-upload.routes.js';
 import scoreRoutes from './routes/score.routes.js';
 import cvRoutes from './routes/cv.routes.js';
 import roadmapRoutes from './routes/roadmap.routes.js';
 
+const uploadDir = resolve(env.UPLOAD_DIR);
+if (!existsSync(uploadDir)) {
+  mkdirSync(uploadDir, { recursive: true });
+}
 const app = express();
 
 app.use(helmet());
@@ -27,9 +34,11 @@ app.use(cors({
   credentials: true,
 }));
 app.use(express.json({ limit: '10mb' }));
+app.use('/uploads', express.static(uploadDir, { maxAge: '7d' }));
 
 app.use(healthRoutes);
 app.use('/api', profileRoutes);
+app.use('/api', profileUploadRoutes);
 app.use('/api', scoreRoutes);
 app.use('/api', cvRoutes);
 app.use('/api', roadmapRoutes);

@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Map, FileText, User, Menu, X } from 'lucide-react';
 import { lazy, Suspense, useState } from 'react';
+import { useProfile } from '../hooks/useProfile';
 
 const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -18,6 +19,8 @@ const navItems = [
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const { data: profile } = useProfile();
+  const avatarUrl = (profile as any)?.avatarImageUrl as string | undefined;
 
   return (
     <header className="sticky top-0 z-50 h-16 border-b border-white/10 bg-brand-900/95 backdrop-blur-md">
@@ -51,6 +54,16 @@ export function Navbar() {
             <span className="font-bold text-white">--</span>
             <span className="text-brand-200/60">/ 100</span>
           </div>
+
+          {avatarUrl && (
+            <NavLink to="/profile" title="Profile" className="hidden sm:block" aria-label="Profile">
+              <img
+                src={avatarUrl}
+                alt="Profile avatar"
+                className="h-9 w-9 rounded-full border border-white/20 object-cover hover:opacity-90"
+              />
+            </NavLink>
+          )}
 
           {CLERK_KEY && (
             <div className="hidden sm:block">

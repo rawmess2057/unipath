@@ -16,6 +16,8 @@ export function DashboardPage() {
   const { data: profile } = useProfile();
   const { data: roadmap } = useRoadmap();
 
+  const avatarUrl = (profile as any)?.avatarImageUrl as string | undefined;
+
   const tasks = (roadmap as any)?.tasks ?? [];
   const completedTasks = tasks.filter((t: any) => t.completed).length;
   const topTasks = tasks.filter((t: any) => !t.completed).slice(0, 3);
@@ -71,6 +73,13 @@ export function DashboardPage() {
             )}
           </div>
           <div className="flex flex-col items-center gap-2">
+            {avatarUrl && (
+              <img
+                src={avatarUrl}
+                alt="Profile avatar"
+                className="h-14 w-14 rounded-full border-2 border-white/30 object-cover shadow-lg"
+              />
+            )}
             <ScoreRing value={scoreLoading ? 0 : totalScore} size="lg" />
           </div>
         </div>
