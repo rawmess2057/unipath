@@ -7,6 +7,7 @@ import { OnboardingWizard } from './features/onboarding/OnboardingWizard';
 import { DashboardPage } from './features/dashboard/DashboardPage';
 import { CvAnalysisPage } from './features/cv-analysis/CvAnalysisPage';
 import { RoadmapPage } from './features/roadmap/RoadmapPage';
+import { OpportunitiesPage } from './features/opportunities/OpportunitiesPage';
 import { ProfilePage } from './features/profile/ProfilePage';
 import { useProfile } from './hooks/useProfile';
 
@@ -54,6 +55,7 @@ export function App() {
             <Route element={<Layout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/roadmap" element={<RoadmapPage />} />
+              <Route path="/opportunities" element={<OpportunitiesPage />} />
               <Route path="/cv-analysis" element={<CvAnalysisPage />} />
               <Route path="/profile" element={<ProfilePage />} />
             </Route>

@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { AlertCircle, Upload, Map, User, ArrowRight, TrendingUp, Flame } from 'lucide-react';
+import { AlertCircle, Upload, Map, User, ArrowRight, TrendingUp, Briefcase, ShieldCheck } from 'lucide-react';
 import { useScore } from '../../hooks/useScore';
 import { useProfile } from '../../hooks/useProfile';
 import { useRoadmap } from '../../hooks/useRoadmap';
+import { useOpportunities } from '../../hooks/useOpportunities';
 import { PageTransition } from '../../components/animations/PageTransition';
 import { ScoreRing } from '../../components/ui/ScoreRing';
 import { Card } from '../../components/ui/Card';
@@ -15,6 +16,8 @@ export function DashboardPage() {
   const { data: score, isLoading: scoreLoading } = useScore();
   const { data: profile } = useProfile();
   const { data: roadmap } = useRoadmap();
+  const { data: opportunities } = useOpportunities({ visaSuitable: true });
+  const recommended = (opportunities ?? []).slice(0, 3);
 
   const avatarUrl = (profile as any)?.avatarImageUrl as string | undefined;
 
@@ -176,6 +179,40 @@ export function DashboardPage() {
                   </div>
                   <Badge variant="success">+{task.pointsValue} pts</Badge>
                   <ArrowRight className="h-4 w-4 flex-shrink-0 text-brand-200/60 group-hover:text-brand-300 group-hover:translate-x-0.5 transition-transform" />
+                </button>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {recommended.length > 0 && (
+        <div className="animate-slideUp" style={{ animationDelay: '400ms' }}>
+          <Card variant="glass">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="font-semibold text-white">Recommended for you</h3>
+              <button
+                onClick={() => navigate('/opportunities')}
+                className="inline-flex items-center gap-1 text-sm font-medium text-brand-300 hover:text-brand-100"
+              >
+                View all <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {recommended.map((opp) => (
+                <button
+                  key={opp.id}
+                  onClick={() => navigate('/opportunities')}
+                  className="group flex w-full items-center gap-3 rounded-lg bg-white/5 p-3 text-left transition-all duration-200 hover:bg-white/10 hover:-translate-y-0.5"
+                >
+                  <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-visa-500/20">
+                    <Briefcase className="h-4 w-4 text-visa-300" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-white">{opp.title}</p>
+                    <p className="truncate text-xs text-brand-200">{opp.company} · {opp.location}</p>
+                  </div>
+                  <Badge variant="slate"><ShieldCheck className="mr-1 h-3 w-3" />{opp.employmentType}</Badge>
                 </button>
               ))}
             </div>

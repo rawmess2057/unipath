@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Map, FileText, User, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Map, FileText, Briefcase, User, Menu, X } from 'lucide-react';
 import { lazy, Suspense, useState } from 'react';
 import { useProfile } from '../hooks/useProfile';
 
@@ -12,6 +12,7 @@ const ClerkUserButton = lazy(() =>
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/roadmap', label: 'Roadmap', icon: Map },
+  { to: '/opportunities', label: 'Opportunities', icon: Briefcase },
   { to: '/cv-analysis', label: 'CV Analysis', icon: FileText },
   { to: '/profile', label: 'Profile', icon: User },
 ];
