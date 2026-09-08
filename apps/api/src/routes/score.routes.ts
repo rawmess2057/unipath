@@ -4,6 +4,39 @@ import { prisma } from '../lib/prisma.js';
 import { calculateScore } from '../services/score-engine.js';
 import type { ScoreInput } from '@unipath/shared';
 
+const MONTH_MS = 1000 * 60 * 60 * 24 * 30.44;
+
+interface ExperienceEntry {
+  startDate?: string;
+  endDate?: string;
+  current?: boolean;
+  isRelevant?: boolean;
+}
+
+function computeExperienceMonths(experiences: unknown): {
+  totalRelevantMonths: number;
+  totalTransferableMonths: number;
+} {
+  const entries = Array.isArray(experiences) ? (experiences as ExperienceEntry[]) : [];
+  let totalRelevantMonths = 0;
+  let totalTransferableMonths = 0;
+
+  for (const entry of entries) {
+    const start = new Date(entry.startDate ?? '');
+    if (Number.isNaN(start.getTime())) continue;
+
+    const end = entry.current || !entry.endDate ? new Date() : new Date(entry.endDate);
+    if (Number.isNaN(end.getTime())) continue;
+    if (end.getTime() <= start.getTime()) continue;
+
+    const months = Math.max(1, Math.round((end.getTime() - start.getTime()) / MONTH_MS));
+    if (entry.isRelevant) totalRelevantMonths += months;
+    else totalTransferableMonths += months;
+  }
+
+  return { totalRelevantMonths, totalTransferableMonths };
+}
+
 const router = Router();
 
 router.get('/score', requireAuth, async (req, res, next) => {
@@ -28,13 +61,19 @@ router.get('/score', requireAuth, async (req, res, next) => {
       include: { tasks: { where: { completed: true } } },
     });
 
-    const certPoints = ((student.profile?.certifications as any[]) ?? []).length * 5;
-
     const completedTaskCount = activeRoadmap?.tasks.length ?? 0;
 
     const appliedCount = await prisma.studentOpportunity.count({
       where: { studentId: student.id, status: 'applied' },
     });
+
+    const { totalRelevantMonths, totalTransferableMonths } = computeExperienceMonths(
+      student.profile?.workExperiences,
+    );
+
+    const certifications = ((student.profile?.certifications as unknown[] | null) ?? []).map(
+      () => ({ points: 5 }),
+    );
 
     const input: ScoreInput = {
       cvQualityScore: latestCv?.cvQualityScore ?? null,
@@ -43,12 +82,10 @@ router.get('/score', requireAuth, async (req, res, next) => {
         targetIndustry: student.profile?.targetIndustry ?? '',
       },
       workExperience: {
-        totalRelevantMonths: 0,
-        totalTransferableMonths: 0,
+        totalRelevantMonths,
+        totalTransferableMonths,
       },
-      certifications: Array.from({ length: Math.min(certPoints, 100) }, (_, i) => ({
-        points: i + 1,
-      })),
+      certifications,
       platformActivity: {
         applications: appliedCount,
         networkingEvents: 0,
@@ -56,10 +93,6 @@ router.get('/score', requireAuth, async (req, res, next) => {
         skillPractice: completedTaskCount,
       },
     };
-
-    if (input.certifications.length === 0 && certPoints > 0) {
-      input.certifications = [{ points: certPoints }];
-    }
 
     const result = calculateScore(input);
 
