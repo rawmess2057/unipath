@@ -1,9 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Upload, Map, User, ArrowRight, TrendingUp, Briefcase, ShieldCheck } from 'lucide-react';
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { useScore } from '../../hooks/useScore';
 import { useProfile } from '../../hooks/useProfile';
 import { useRoadmap } from '../../hooks/useRoadmap';
 import { useOpportunities } from '../../hooks/useOpportunities';
+import { useScoreHistory } from '../../hooks/useScoreHistory';
+import { WeeklyCheckinCard } from './WeeklyCheckinCard';
 import { PageTransition } from '../../components/animations/PageTransition';
 import { ScoreRing } from '../../components/ui/ScoreRing';
 import { Card } from '../../components/ui/Card';
@@ -17,6 +20,7 @@ export function DashboardPage() {
   const { data: profile } = useProfile();
   const { data: roadmap } = useRoadmap();
   const { data: opportunities } = useOpportunities({ visaSuitable: true });
+  const { data: history } = useScoreHistory();
   const recommended = (opportunities ?? []).slice(0, 3);
 
   const avatarUrl = (profile as any)?.avatarImageUrl as string | undefined;
@@ -51,8 +55,14 @@ export function DashboardPage() {
             {score && (
               <>
                 <div className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 text-sm font-medium">
-                  <TrendingUp className="h-3.5 w-3.5 text-success-300" />
-                  <span className="text-success-200">+0 points this week</span>
+                  <TrendingUp className={`h-3.5 w-3.5 ${(history?.weekDelta ?? 0) > 0 ? 'text-success-300' : 'text-brand-200'}`} />
+                  <span className={(history?.weekDelta ?? 0) > 0 ? 'text-success-200' : (history?.weekDelta ?? 0) < 0 ? 'text-danger-300' : 'text-brand-200'}>
+                    {(history?.weekDelta ?? 0) > 0
+                      ? `+${history?.weekDelta} points this week`
+                      : (history?.weekDelta ?? 0) < 0
+                        ? `${history?.weekDelta} points this week`
+                        : 'No change this week'}
+                  </span>
                 </div>
                 {(() => {
                   const next = getNextLevel(totalScore);
@@ -87,6 +97,8 @@ export function DashboardPage() {
           </div>
         </div>
       </div>
+
+      <WeeklyCheckinCard />
 
       {isPartial && (
         <div className="rounded-xl border border-warning-500/30 bg-warning-500/10 p-4">
@@ -159,10 +171,54 @@ export function DashboardPage() {
         </Card>
       </div>
 
+<div className="animate-slideUp" style={{ animationDelay: '300ms' }}>
+        <Card variant="glass">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="font-semibold text-white">Progress over time</h3>
+            <span className="text-xs text-brand-200">Last 30 days</span>
+          </div>
+          {(history?.points ?? []).length > 0 ? (
+            <ResponsiveContainer width="100%" height={200}>
+              <AreaChart data={history?.points} margin={{ top: 4, right: 8, bottom: 0, left: -18 }}>
+                <defs>
+                  <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#8b5cf6" stopOpacity={0.45} />
+                    <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fill: 'rgba(233, 213, 255, 0.6)', fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={false}
+                  minTickGap={24}
+                  tickFormatter={(v) => new Date(String(v) + 'T00:00:00Z').toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                />
+                <YAxis domain={[0, 100]} tick={{ fill: 'rgba(233, 213, 255, 0.6)', fontSize: 11 }} tickLine={false} axisLine={false} />
+                <Tooltip
+                  contentStyle={{ background: '#1e1636', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 12, color: '#fff', fontSize: 12 }}
+                  labelStyle={{ color: '#e9d5ff' }}
+                  formatter={(value) => [`${value} / 100`, 'Score']}
+                  labelFormatter={(label) => new Date(String(label) + 'T00:00:00Z').toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                />
+                <Area type="monotone" dataKey="totalScore" stroke="#a78bfa" strokeWidth={2} fill="url(#scoreGradient)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="py-8 text-center text-sm text-brand-200">
+              {history?.current == null
+                ? 'Complete your profile and check in weekly to see your score trend here.'
+                : 'No score history yet — your trend appears as you use the platform.'}
+            </p>
+          )}
+        </Card>
+      </div>
+
       {topTasks.length > 0 && (
-        <div className="animate-slideUp" style={{ animationDelay: '300ms' }}>
-          <Card variant="glass">
-            <h3 className="mb-4 font-semibold text-white">Top 3 Actions to Raise Your Score</h3>
+      <div className="animate-slideUp" style={{ animationDelay: '300ms' }}>
+        <Card variant="glass">
+          <h3 className="mb-4 font-semibold text-white">Top 3 Actions to Raise Your Score</h3>
             <div className="space-y-2">
               {topTasks.map((task: any, idx: number) => (
                 <button

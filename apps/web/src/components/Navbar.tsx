@@ -2,6 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Map, FileText, Briefcase, User, Menu, X } from 'lucide-react';
 import { lazy, Suspense, useState } from 'react';
 import { useProfile } from '../hooks/useProfile';
+import { useScore } from '../hooks/useScore';
 
 const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -21,6 +22,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { data: profile } = useProfile();
+  const { data: score, isLoading: scoreLoading } = useScore();
   const avatarUrl = (profile as any)?.avatarImageUrl as string | undefined;
 
   return (
@@ -51,8 +53,8 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <div className="hidden items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-brand-200 sm:flex">
-            <span className="font-bold text-white">--</span>
+          <div className="hidden items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-brand-200 sm:flex" title="Employability Score">
+            <span className="font-bold text-white">{scoreLoading ? '--' : score?.totalScore ?? '--'}</span>
             <span className="text-brand-200/60">/ 100</span>
           </div>
 
