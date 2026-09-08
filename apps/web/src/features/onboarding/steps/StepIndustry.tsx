@@ -21,29 +21,29 @@ export function StepIndustry({ value, onChange, error }: StepIndustryProps) {
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-bold text-slate-800">Your goals</h2>
-        <p className="mt-1 text-sm text-slate-500">We use this to build your personalised roadmap.</p>
+        <h2 className="text-xl font-bold text-white">Your goals</h2>
+        <p className="mt-1 text-sm text-brand-200">We use this to build your personalised roadmap.</p>
       </div>
 
       <div className="relative">
         <div
-          className={`flex cursor-pointer items-center justify-between rounded-lg border bg-white px-4 py-2.5 text-sm ${
-            value ? 'text-slate-800' : 'text-slate-400'
-          } ${error ? 'border-danger-400' : 'border-slate-200'}`}
+          className={`flex cursor-pointer items-center justify-between rounded-lg border bg-white/10 px-4 py-2.5 text-sm ${
+            value ? 'text-white' : 'text-brand-300/60'
+          } ${error ? 'border-danger-500' : 'border-white/20'}`}
           onClick={() => setOpen(!open)}
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter') setOpen(!open); }}
         >
           <span>{value || 'Select an industry...'}</span>
-          <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`h-4 w-4 text-brand-300 transition-transform ${open ? 'rotate-180' : ''}`} />
         </div>
 
         {open && (
-          <div className="absolute z-20 mt-1 w-full rounded-lg border border-slate-200 bg-white shadow-lg">
-            <div className="flex items-center gap-2 border-b border-slate-100 px-3 py-2">
-              <Search className="h-4 w-4 text-slate-400" />
+          <div className="absolute z-20 mt-1 w-full rounded-lg border border-white/20 bg-brand-900/95 shadow-2xl backdrop-blur">
+            <div className="flex items-center gap-2 border-b border-white/10 px-3 py-2">
+              <Search className="h-4 w-4 text-brand-300" />
               <input
-                className="w-full border-none text-sm outline-none placeholder:text-slate-400"
+                className="w-full border-none bg-transparent text-sm text-white outline-none placeholder:text-brand-300/60"
                 placeholder="Search industries..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -55,24 +55,26 @@ export function StepIndustry({ value, onChange, error }: StepIndustryProps) {
                 <button
                   key={industry}
                   type="button"
-                  className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm hover:bg-slate-50 ${
-                    value === industry ? 'bg-brand-50 font-medium text-brand-700' : 'text-slate-700'
+                  className={`flex w-full items-center justify-between px-4 py-2 text-left text-sm hover:bg-white/10 ${
+                    value === industry
+                      ? 'bg-brand-500/20 font-medium text-brand-200'
+                      : 'text-brand-100'
                   }`}
                   onClick={() => { onChange(industry); setOpen(false); setSearch(''); }}
                 >
                   {industry}
-                  {value === industry && <Check className="h-4 w-4 text-brand-500" />}
+                  {value === industry && <Check className="h-4 w-4 text-brand-400" />}
                 </button>
               ))}
               {filtered.length === 0 && (
-                <p className="px-4 py-3 text-sm text-slate-400">No industries found.</p>
+                <p className="px-4 py-3 text-sm text-brand-300">No industries found.</p>
               )}
             </div>
           </div>
         )}
       </div>
 
-      {error && <p className="text-xs text-danger-600">{error}</p>}
+      {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   );
 }

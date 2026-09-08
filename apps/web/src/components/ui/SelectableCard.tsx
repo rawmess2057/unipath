@@ -16,14 +16,14 @@ export function SelectableCard({ selected, onClick, icon, label, description }: 
       onClick={onClick}
       className={`relative flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left transition-all ${
         selected
-          ? 'border-brand-500 bg-brand-50 ring-2 ring-brand-100'
-          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+          ? 'border-brand-400 bg-brand-500/25 ring-2 ring-brand-400/40'
+          : 'border-white/10 bg-white/10 hover:border-white/25 hover:bg-white/15'
       }`}
     >
       <div className="flex-shrink-0 text-2xl">{icon}</div>
       <div className="flex-1">
-        <div className="font-medium text-slate-800">{label}</div>
-        <div className="text-sm text-slate-500">{description}</div>
+        <div className="font-medium text-white">{label}</div>
+        <div className="text-sm text-brand-200">{description}</div>
       </div>
       {selected && (
         <div className="flex-shrink-0 rounded-full bg-brand-500 p-1">

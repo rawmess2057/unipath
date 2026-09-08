@@ -17,8 +17,8 @@ export function StepVisaStatus({ value, onChange, error }: StepVisaStatusProps) 
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-bold text-slate-800">What's your visa status?</h2>
-        <p className="mt-1 text-sm text-slate-500">This helps us tailor timing and guidance.</p>
+        <h2 className="text-xl font-bold text-white">What's your visa status?</h2>
+        <p className="mt-1 text-sm text-brand-200">This helps us tailor timing and guidance.</p>
       </div>
 
       <div className="space-y-3">
@@ -34,7 +34,7 @@ export function StepVisaStatus({ value, onChange, error }: StepVisaStatusProps) 
         ))}
       </div>
 
-      {error && <p className="text-xs text-danger-600">{error}</p>}
+      {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   );
 }

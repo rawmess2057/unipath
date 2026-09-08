@@ -1,17 +1,6 @@
 import { useState } from 'react';
 import { X, Plus } from 'lucide-react';
-
-const skillSuggestions: Record<string, string[]> = {
-  Technology: ['Python', 'JavaScript', 'TypeScript', 'React', 'Node.js', 'SQL', 'AWS', 'Git', 'Docker', 'REST APIs', 'Agile', 'Machine Learning'],
-  Finance: ['Financial Analysis', 'Excel', 'Bloomberg', 'Valuation', 'Accounting', 'Risk Management', 'SQL', 'Tableau', 'Python'],
-  Consulting: ['Data Analysis', 'Excel', 'PowerPoint', 'Stakeholder Management', 'Market Research', 'Strategy', 'Project Management'],
-  Healthcare: ['Clinical Research', 'Data Analysis', 'Regulatory Affairs', 'Medical Terminology', 'Patient Care', 'Healthcare IT'],
-  Engineering: ['MATLAB', 'AutoCAD', 'SolidWorks', 'Python', 'Project Management', 'CFD', 'Finite Element Analysis'],
-  Marketing: ['SEO', 'Google Analytics', 'Content Strategy', 'Social Media', 'SEM', 'Marketing Automation', 'Data Analysis', 'Excel'],
-  Law: ['Legal Research', 'Contract Law', 'Commercial Awareness', 'Negotiation', 'Drafting', 'Compliance'],
-  Education: ['Curriculum Design', 'Classroom Management', 'Assessment', 'Educational Technology', 'Data Analysis'],
-  Other: ['Communication', 'Leadership', 'Problem Solving', 'Teamwork', 'Time Management', 'Data Analysis', 'Excel', 'Project Management'],
-};
+import { skillsForIndustry } from '../skills-data';
 
 interface StepSkillsProps {
   industry: string;
@@ -33,17 +22,17 @@ export function StepSkills({ industry, values, onChange }: StepSkillsProps) {
     onChange(skills.filter((x) => x !== s));
   };
 
-  const suggestions = skillSuggestions[industry] ?? skillSuggestions.Other;
+  const suggestions = skillsForIndustry(industry);
 
   return (
     <div className="space-y-5">
       <div>
-        <h2 className="text-xl font-bold text-slate-800">Your top skills</h2>
-        <p className="mt-1 text-sm text-slate-500">Select at least 3 — you can add more later.</p>
+        <h2 className="text-xl font-bold text-white">Your top skills</h2>
+        <p className="mt-1 text-sm text-brand-200">Select at least 3 — you can add more later.</p>
       </div>
 
       <div>
-        <p className="mb-2 text-sm font-medium text-slate-700">Common skills for {industry}</p>
+        <p className="mb-2 text-sm font-medium text-brand-100">Common skills for {industry}</p>
         <div className="flex flex-wrap gap-2">
           {suggestions.map((s) => {
             const selected = skills.includes(s);
@@ -54,8 +43,8 @@ export function StepSkills({ industry, values, onChange }: StepSkillsProps) {
                 onClick={() => selected ? removeSkill(s) : addSkill(s)}
                 className={`rounded-full px-3 py-1 text-sm transition-colors ${
                   selected
-                    ? 'bg-brand-100 text-brand-700'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    ? 'bg-brand-500/40 text-white'
+                    : 'bg-white/10 text-brand-100 hover:bg-white/20'
                 }`}
               >
                 {s}
@@ -67,7 +56,7 @@ export function StepSkills({ industry, values, onChange }: StepSkillsProps) {
       </div>
 
       <div>
-        <p className="mb-2 text-sm font-medium text-slate-700">Add custom skills</p>
+        <p className="mb-2 text-sm font-medium text-brand-100">Add custom skills</p>
         <div className="flex gap-2">
           <input
             value={input}
@@ -75,7 +64,7 @@ export function StepSkills({ industry, values, onChange }: StepSkillsProps) {
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addSkill(input); setInput(''); } }}
             placeholder="Type a skill and press Enter"
             disabled={skills.length >= 10}
-            className="flex-1 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm placeholder-slate-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100 disabled:opacity-50"
+            className="flex-1 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm text-white placeholder-brand-300/60 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30 disabled:opacity-50"
           />
           <button
             type="button"
@@ -90,14 +79,14 @@ export function StepSkills({ industry, values, onChange }: StepSkillsProps) {
 
       {skills.length > 0 && (
         <div>
-          <p className={`mb-2 text-sm ${skills.length < 3 ? 'text-warning-600' : 'text-slate-500'}`}>
+          <p className={`mb-2 text-sm ${skills.length < 3 ? 'text-amber-300' : 'text-brand-200'}`}>
             {skills.length}/10 {skills.length < 3 ? '(minimum 3)' : ''}
           </p>
           <div className="flex flex-wrap gap-2">
             {skills.map((s) => (
-              <span key={s} className="inline-flex items-center gap-1 rounded-full bg-brand-100 px-3 py-1 text-sm text-brand-700">
+              <span key={s} className="inline-flex items-center gap-1 rounded-full bg-brand-500/30 px-3 py-1 text-sm text-brand-100">
                 {s}
-                <button type="button" onClick={() => removeSkill(s)} className="hover:text-brand-900" aria-label={`Remove ${s}`}>
+                <button type="button" onClick={() => removeSkill(s)} className="hover:text-white" aria-label={`Remove ${s}`}>
                   <X className="h-3 w-3" />
                 </button>
               </span>
@@ -106,7 +95,7 @@ export function StepSkills({ industry, values, onChange }: StepSkillsProps) {
         </div>
       )}
 
-      {skills.length >= 10 && <p className="text-xs text-warning-600">Maximum 10 skills reached for this step.</p>}
+      {skills.length >= 10 && <p className="text-xs text-amber-300">Maximum 10 skills reached for this step.</p>}
     </div>
   );
 }
