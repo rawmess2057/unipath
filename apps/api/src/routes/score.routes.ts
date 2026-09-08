@@ -32,6 +32,10 @@ router.get('/score', requireAuth, async (req, res, next) => {
 
     const completedTaskCount = activeRoadmap?.tasks.length ?? 0;
 
+    const appliedCount = await prisma.studentOpportunity.count({
+      where: { studentId: student.id, status: 'applied' },
+    });
+
     const input: ScoreInput = {
       cvQualityScore: latestCv?.cvQualityScore ?? null,
       skillsMatch: {
@@ -46,7 +50,7 @@ router.get('/score', requireAuth, async (req, res, next) => {
         points: i + 1,
       })),
       platformActivity: {
-        applications: 0,
+        applications: appliedCount,
         networkingEvents: 0,
         interviews: 0,
         skillPractice: completedTaskCount,

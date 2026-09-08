@@ -16,6 +16,7 @@ model Student {
   cvAnalyses      CvAnalysis[]
   roadmaps        Roadmap[]
   scoreSnapshots  ScoreSnapshot[]
+  studentOpportunities StudentOpportunity[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -133,4 +134,45 @@ model ScoreRubric {
   version   Int      @default(1)
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+}
+
+model Opportunity {
+  id               String   @id @default(uuid())
+  title            String
+  company          String
+  location         String
+  employmentType   String
+  industry         String
+  salaryRange      String?
+  description      String
+  requirements     Json?
+  applicationUrl   String?
+  deadline         DateTime?
+  visaSuitable     Boolean  @default(true)
+  sponsorshipNote  String?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  studentOpportunities StudentOpportunity[]
+
+  @@index([industry])
+  @@index([employmentType])
+  @@index([isActive])
+}
+
+model StudentOpportunity {
+  id            String      @id @default(uuid())
+  studentId     String
+  student       Student     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  status        String      @default("saved")
+  appliedAt     DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([studentId, opportunityId])
+  @@index([studentId])
+  @@index([opportunityId])
 }
