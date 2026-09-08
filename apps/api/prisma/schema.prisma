@@ -13,10 +13,11 @@ model Student {
   email     String
   name      String?
   profile   Profile?
+  studentOpportunities StudentOpportunity[]
+  weeklyCheckins WeeklyCheckin[]
   cvAnalyses      CvAnalysis[]
   roadmaps        Roadmap[]
   scoreSnapshots  ScoreSnapshot[]
-  studentOpportunities StudentOpportunity[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -175,4 +176,18 @@ model StudentOpportunity {
   @@unique([studentId, opportunityId])
   @@index([studentId])
   @@index([opportunityId])
+}
+
+model WeeklyCheckin {
+  id           String   @id @default(uuid())
+  studentId    String
+  student      Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  weekStart    DateTime
+  data         Json
+  pointsEarned Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([studentId, weekStart])
+  @@index([studentId])
 }

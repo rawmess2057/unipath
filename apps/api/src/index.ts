@@ -13,6 +13,7 @@ import scoreRoutes from './routes/score.routes.js';
 import cvRoutes from './routes/cv.routes.js';
 import roadmapRoutes from './routes/roadmap.routes.js';
 import opportunitiesRoutes from './routes/opportunities.routes.js';
+import checkinRoutes from './routes/checkin.routes.js';
 
 const uploadDir = resolve(env.UPLOAD_DIR);
 if (!existsSync(uploadDir)) {
@@ -48,6 +49,7 @@ app.use('/api', scoreRoutes);
 app.use('/api', cvRoutes);
 app.use('/api', roadmapRoutes);
 app.use('/api', opportunitiesRoutes);
+app.use('/api', checkinRoutes);
 
 app.use(errorHandler);
 
