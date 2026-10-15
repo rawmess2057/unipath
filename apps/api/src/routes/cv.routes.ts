@@ -73,6 +73,7 @@ router.post('/cv/analyze', requireAuth, upload.single('file'), async (req, res, 
         studentId: student.id,
         fileHash,
         originalFileName: req.file.originalname,
+        extractedText: cvText,
       },
     });
 
@@ -86,6 +87,32 @@ router.post('/cv/analyze', requireAuth, upload.single('file'), async (req, res, 
     });
 
     res.json({ success: true, data: { id: analysis.id, status: 'queued' } });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/cv/analysis/latest', requireAuth, async (req, res, next) => {
+  try {
+    const analysis = await prisma.cvAnalysis.findFirst({
+      where: { student: { clerkId: req.user!.clerkId } },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!analysis) {
+      res.json({ success: true, data: null });
+      return;
+    }
+
+    const { cvQualityScore: _hidden, ...userFacing } = analysis;
+
+    res.json({
+      success: true,
+      data: {
+        ...userFacing,
+        status: analysis.cvQualityScore !== null ? 'completed' : 'processing',
+      },
+    });
   } catch (err) {
     next(err);
   }
