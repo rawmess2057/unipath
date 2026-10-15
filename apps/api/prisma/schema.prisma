@@ -50,6 +50,7 @@ model CvAnalysis {
   student              Student  @relation(fields: [studentId], references: [id])
   fileHash             String
   originalFileName     String?
+  extractedText        String?
   overallSummary       String?
   strengths            String[]
   priorityImprovements String[]

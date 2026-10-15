@@ -1,10 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../lib/api-client';
+import type { ApiRoadmap } from '../lib/roadmap-stages';
 
-export function useRoadmap() {
-  return useQuery({
+export function useRoadmap(opts: { refetchInterval?: number | false } = {}) {
+  return useQuery<ApiRoadmap | null>({
     queryKey: ['roadmap'],
-    queryFn: () => api.get<any>('/roadmap'),
+    queryFn: () => api.get<ApiRoadmap | null>('/roadmap'),
+    refetchInterval: opts.refetchInterval ?? false,
   });
 }
 
@@ -23,6 +25,7 @@ export function useToggleTask() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['roadmap'] });
       qc.invalidateQueries({ queryKey: ['score'] });
+      qc.invalidateQueries({ queryKey: ['score-history'] });
     },
   });
 }

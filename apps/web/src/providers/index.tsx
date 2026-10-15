@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
-import { Toaster } from 'sonner';
 import { ClerkProvider } from '@clerk/clerk-react';
 import type { ReactNode } from 'react';
 import { AuthSync } from '../components/AuthSync';
@@ -19,7 +18,6 @@ export function Providers({ children }: { children: ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <AuthSync />
         {children}
-        <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
       </QueryClientProvider>
     </BrowserRouter>
   );
